@@ -114,9 +114,13 @@ body {
   font-weight: bold;
   line-height: 100px;
   z-index: 110;
-  opacity: .5;
-  background-color: black;
+  opacity: .1;
   color: #888;
+}
+
+#imgoverlay .nav a.prev:hover,
+#imgoverlay .nav a.next:hover {
+  opacity: .5;
 }
 
 #imgoverlay .nav a.prev span,
@@ -127,12 +131,24 @@ body {
   width: 100px;
   height: 100px;
   margin-top: -50px;
+  background-color: black;
 }
 
 #imgoverlay .nav a.prev {
   left: 0;
 }
 
+#imgoverlay .nav a.prev span {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
 #imgoverlay .nav a.next {
   right: 0;
+}
+
+#imgoverlay .nav a.next span {
+  right: 0;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
