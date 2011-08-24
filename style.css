@@ -1,0 +1,138 @@
+body {
+  background-color: #ccc;
+  color: #444;
+  text-shadow: 0 1px 1px white;
+  font-family: Verdana, Arial, sans-serif;
+}
+
+.thumb {
+  position: relative;
+  overflow: hidden;
+  float: left;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid #888;
+  background-color: #aaa;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.thumb span.title {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  font-size: 10px;
+  text-align: center;
+  padding: 3px 0 8px;
+  background-color: #888;
+  opacity: 0.6;
+  text-shadow: 0 1px 1px #ccc;
+  color: black;
+}
+
+.thumb:hover span.title {
+  display: block;
+}
+
+.thumb img {
+  max-height: 200px;
+  max-width: 200px;
+}
+
+#imgoverlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+#imgoverlay .bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  opacity: .8;
+  z-index: 101;
+}
+
+#imgoverlay .image {
+  width: 100%;
+  z-index: 102;
+  position: relative;
+  margin: 20px 0 10px;
+}
+
+#imgoverlay .image img {
+  display: block;
+  margin: 0 auto;
+  border: 1px solid black;
+}
+
+#imgoverlay .nav {
+  z-index: 103;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+#imgoverlay .nav a {
+  text-decoration: none;
+  text-align: center;
+  position: absolute;
+  display: none;
+}
+
+#imgoverlay .nav:hover a {
+  display: block;
+}
+
+#imgoverlay .nav a.close {
+  top: 0;
+  lefT: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 109;
+}
+
+#imgoverlay .nav a.close span {
+  display: none;
+}
+
+#imgoverlay .nav a.prev,
+#imgoverlay .nav a.next {
+  width: 100px;
+  height: 100%;
+  font-size: 50px;
+  font-weight: bold;
+  line-height: 100px;
+  z-index: 110;
+  opacity: .5;
+  background-color: black;
+  color: #888;
+}
+
+#imgoverlay .nav a.prev span,
+#imgoverlay .nav a.next span {
+  display: block;
+  position: absolute;
+  top: 50%;
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+}
+
+#imgoverlay .nav a.prev {
+  left: 0;
+}
+
+#imgoverlay .nav a.next {
+  right: 0;
+}
