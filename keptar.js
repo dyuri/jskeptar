@@ -65,12 +65,19 @@
 
   Keptar.prototype.showImage = function (image) {
     this.image = image;
-    var $overlay = $("#imgoverlay");
+    var $overlay = $("#imgoverlay"), path;
+
+    if (!this.dir) {
+      path = this.image.split('/');
+      path.pop();
+      this.dir = path.join('/');
+    }
 
     if ($overlay.length === 0) {
       $overlay = $.tmpl(this.config.overlaytmpl, {
         prev: this.getPrevImage(image),
         next: this.getNextImage(image),
+        image: this.image,
         dir: this.dir
       });
       $("body").append($overlay);
@@ -142,9 +149,7 @@
       thumbEl = $.tmpl(this.config.thumbtmpl, {
         url: "#!file=" + this.dir + this.images[i].image,
         title: this.images[i].title || this.images[i].image,
-        thumb: this.dir + this.images[i].thumbnail,
-        th: this.config.thumbheight,
-        tw: this.config.thumbwidth
+        thumb: this.dir + this.images[i].thumbnail
       });
       this.config.$container.append(thumbEl);
     }
@@ -201,10 +206,8 @@
   };
 
   Keptar.CONFIG = {
-    thumbwidth: 200,
-    thumbheight: 200,
-    thumbtmpl: $.template(null, '<div class="thumb" style="height: ${th}px; width: ${tw}px;"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>'),
-    overlaytmpl: $.template(null, '<div id="imgoverlay" class="overlay"><div class="bg"></div><div class="nav"><a class="prev" href="#!file=${prev}"><span>&lt;</span></a><a class="next" href="#!file=${next}"><span>&gt;</span></a><a class="close" href="#!file=${dir}"><span>[x]</span></a></div><div class="image"></div></div>'),
+    thumbtmpl: $.template(null, '<div class="thumb"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>'),
+    overlaytmpl: $.template(null, '<div id="imgoverlay" class="overlay"><div class="bg"></div><div class="nav"><a class="prev" href="#!file=${prev}"><span>&lt;</span></a><a class="next" href="#!file=${next}"><span>&gt;</span></a><a class="close" href="#!file=${dir}"><span>[x]</span></a><a class="download" href="${image}"><span>Download</span></a></div><div class="image"></div></div>'),
     $container: $("#content")
   };
 

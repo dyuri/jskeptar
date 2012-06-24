@@ -6,9 +6,9 @@ body {
 }
 
 .thumb {
+  display: inline-block;
   position: relative;
   overflow: hidden;
-  float: left;
   margin: 5px;
   padding: 5px;
   border: 1px solid #888;
@@ -17,6 +17,8 @@ body {
   -moz-border-radius: 5px;
   border-radius: 5px;
   text-align: center;
+  height: 200px;
+  width: 200px;
 }
 
 .thumb span.title {
@@ -38,16 +40,25 @@ body {
   display: block;
 }
 
+.thumb a {
+  line-height: 200px;
+  display: inline-block;
+}
+
 .thumb img {
   max-height: 200px;
   max-width: 200px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 #imgoverlay {
   position: fixed;
-  width: 100%;
-  height: 100%;
   z-index: 100;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
 }
 
 #imgoverlay .bg {
@@ -62,16 +73,20 @@ body {
 }
 
 #imgoverlay .image {
-  width: 100%;
   z-index: 102;
-  position: relative;
-  margin: 20px 0 10px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  bottom: 20px;
+  right: 20px;
+  text-align: center;
 }
 
 #imgoverlay .image img {
-  display: block;
-  margin: 0 auto;
+  display: inline-block;
   border: 1px solid black;
+  max-height: 100%;
+  max-width: 100%;
 }
 
 #imgoverlay .nav {
@@ -96,10 +111,11 @@ body {
 
 #imgoverlay .nav a.close {
   top: 0;
-  lefT: 0;
+  left: 0;
   bottom: 0;
   right: 0;
   z-index: 109;
+  cursor: default;
 }
 
 #imgoverlay .nav a.close span {
@@ -118,9 +134,29 @@ body {
   color: #888;
 }
 
+#imgoverlay .nav a.download {
+  width: 100%;
+  font-size:20px;
+  font-weight: bold;
+  z-index: 111;
+  opacity: .1;
+  color: #888;
+  text-align: center;
+  bottom: 0;
+}
+
+#imgoverlay .nav a.download:hover,
 #imgoverlay .nav a.prev:hover,
 #imgoverlay .nav a.next:hover {
   opacity: .5;
+}
+
+#imgoverlay .nav a.download span {
+  display: inline-block;
+  background-color: black;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  padding: 10px 20px;
 }
 
 #imgoverlay .nav a.prev span,
