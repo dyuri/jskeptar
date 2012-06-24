@@ -68,9 +68,8 @@
     var $overlay = $("#imgoverlay"), path;
 
     if (!this.dir) {
-      path = this.image.split('/');
-      path.pop();
-      this.dir = path.join('/');
+      this.dir = this.getDir(this.image);
+      this.loadDir(this.dir);
     }
 
     if ($overlay.length === 0) {
@@ -96,10 +95,13 @@
         $prev = $overlay.find("a.prev"),
         $next = $overlay.find("a.next"),
         next = this.getNextImage(image),
-        prev = this.getPrevImage(image);
+        prev = this.getPrevImage(image),
+        $spinner = $overlay.find(".spinner");
 
+    $spinner.show();
     img.onload = function () {
       keptar.imageLoaded(img, $overlay);
+      $spinner.hide();
     };
     img.src = image;
 
@@ -128,14 +130,17 @@
 
       image.width = w;
       image.height = h;
+      // TODO fade
+      // TODO center vertically
       $imgcnt.html(image);
     }
   };
 
   Keptar.prototype.loadDir = function (dir) {
-    var dataURL = dir + "images.json";
+    var dataURL;
 
-    this.dir = dir;
+    this.dir = dir + (dir[dir.length-1] === '/' ? '' : '/');
+    dataURL = this.dir + "images.json";
     $.getJSON(dataURL, $.proxy(this.loadDirCallback, this));
   };
 
@@ -158,56 +163,75 @@
   Keptar.prototype.getPrevImage = function (image) {
     var i, prev, l, img;
 
-    if (this.images) {
+    this.dir = this.dir || this.getDir(image);
 
-      l = this.images.length;
-      img = this.dir + this.images[0].image;
-
-      if (img === image) {
-        return this.dir + this.images[l - 1].image;
-      }
-
-      prev = img;
-      for (i = 1; i < l; i++) {
-        img = this.dir + this.images[i].image;
-        if (img === image) {
-          return prev;
-        }
-        prev = img;
-      }
+    if (!this.images) {
+      return this.dir;
     }
 
-    return null;
+    l = this.images.length;
+    img = this.dir + this.images[0].image;
+
+    if (img === image) {
+      return this.dir + this.images[l - 1].image;
+    }
+
+    prev = img;
+    for (i = 1; i < l; i++) {
+      img = this.dir + this.images[i].image;
+      if (img === image) {
+        return prev;
+      }
+      prev = img;
+    }
+
+    return prev;
   };
 
   Keptar.prototype.getNextImage = function (image) {
     var i, next, l, img;
 
-    if (this.images) {
+    this.dir = this.dir || this.getDir(image);
 
-      l = this.images.length;
-      img = this.dir + this.images[l - 1].image;
-
-      if (img === image) {
-        return this.dir + this.images[0].image;
-      }
-
-      next = img;
-      for (i = l - 2; i >= 0; i--) {
-        img = this.dir + this.images[i].image;
-        if (img === image) {
-          return next;
-        }
-        next = img;
-      }
+    if (!this.images) {
+      return this.dir;
     }
 
-    return null;
+    l = this.images.length;
+    img = this.dir + this.images[l - 1].image;
+
+    if (img === image) {
+      return this.dir + this.images[0].image;
+    }
+
+    next = img;
+    for (i = l - 2; i >= 0; i--) {
+      img = this.dir + this.images[i].image;
+      if (img === image) {
+        return next;
+      }
+      next = img;
+    }
+
+    return next;
+  };
+
+  Keptar.prototype.getDir = function (image) {
+    var dir, path;
+
+    image = image || this.image;
+
+    path = image.split('/');
+    path.pop();
+    dir = path.join('/');
+    dir = dir + (dir[dir.length-1] === '/' ? '' : '/');
+
+    return dir;
   };
 
   Keptar.CONFIG = {
     thumbtmpl: $.template(null, '<div class="thumb"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>'),
-    overlaytmpl: $.template(null, '<div id="imgoverlay" class="overlay"><div class="bg"></div><div class="nav"><a class="prev" href="#!file=${prev}"><span>&lt;</span></a><a class="next" href="#!file=${next}"><span>&gt;</span></a><a class="close" href="#!file=${dir}"><span>[x]</span></a><a class="download" href="${image}"><span>Download</span></a></div><div class="image"></div></div>'),
+    overlaytmpl: $.template(null, '<div id="imgoverlay" class="overlay"><div class="bg"></div><div class="spinner">loading...</div><div class="nav"><a class="prev" href="#!file=${prev}"><span>&lt;</span></a><a class="next" href="#!file=${next}"><span>&gt;</span></a><a class="close" href="#!file=${dir}"><span>[x]</span></a><a class="download" href="${image}"><span>Download</span></a></div><div class="image"></div></div>'),
     $container: $("#content")
   };
 

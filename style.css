@@ -72,6 +72,27 @@ body {
   z-index: 101;
 }
 
+#imgoverlay .spinner {
+  z-index: 120;
+  background-color: black;
+  color: #fff;
+  opacity: .6;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  font-size: 20px;
+  width: 200px;
+  height: 30px;
+  line-height: 30px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  text-align: center;
+  display: none;
+}
+
 #imgoverlay .image {
   z-index: 102;
   position: absolute;
