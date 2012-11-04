@@ -96,17 +96,29 @@
         $next = $overlay.find("a.next"),
         next = this.getNextImage(image),
         prev = this.getPrevImage(image),
-        $spinner = $overlay.find(".spinner");
+        $spinner = $overlay.find(".spinner"),
+        i, l;
 
     $spinner.show();
+
+    if (this.dir && this.images) {
+      for (i = 0, l = this.images.length; i < l; i++) {
+        if (this.dir + this.images[i].image === image && 
+            this.images[i].qvimage &&
+            this.images[i].qvimage.complete) {
+          this.imageLoaded(this.images[i].qvimage, $overlay);
+        }
+      }
+    }
+
+    $prev.attr("href", "#!file="+prev);
+    $next.attr("href", "#!file="+next);
+
     img.onload = function () {
       keptar.imageLoaded(img, $overlay);
       $spinner.hide();
     };
     img.src = image;
-
-    $prev.attr("href", "#!file="+prev);
-    $next.attr("href", "#!file="+next);
 
   };
 
@@ -148,7 +160,13 @@
     var i, l, thumbEl,
         fragment = document.createDocumentFragment();
 
-    this.images = data.images || [];
+    this.images = [];
+
+    for (i = 0, l = data.images.length; i < l; i++) {
+      if (data.images[i].image) {
+        this.images.push(data.images[i]);
+      }
+    }
 
     for (i = 0, l = this.images.length; i < l; i++) {
       thumbEl = $.tmpl(this.config.thumbtmpl, {
@@ -158,6 +176,26 @@
       });
       this.config.$container.append(thumbEl);
     }
+
+    setTimeout($.proxy(this.loadQuickView, this), 10);
+
+  };
+
+  Keptar.prototype.loadQuickView = function () {
+    var imgObj, i, l;
+
+    if (!this.images) {
+      return;
+    }
+
+    for (i = 0, l = this.images.length; i < l; i++) {
+      if (this.images[i].quickview) {
+        imageObj = new Image();
+        imageObj.src = this.dir + this.images[i].quickview;
+        this.images[i].qvimage = imageObj;
+      }
+    }
+
   };
 
   Keptar.prototype.getPrevImage = function (image) {
