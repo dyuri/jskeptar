@@ -103,22 +103,36 @@
 
     if (this.dir && this.images) {
       for (i = 0, l = this.images.length; i < l; i++) {
-        if (this.dir + this.images[i].image === image && 
-            this.images[i].qvimage &&
-            this.images[i].qvimage.complete) {
-          this.imageLoaded(this.images[i].qvimage, $overlay);
+        if (this.dir + this.images[i].image === image) {
+          if (this.images[i].qvimage &&
+              this.images[i].qvimage.complete) {
+            this.imageLoaded(this.images[i].qvimage, $overlay);
+          } else {
+            this.loadQuickView(image, $overlay);
+          }
         }
       }
     }
 
-    $prev.attr("href", "#!file="+prev);
-    $next.attr("href", "#!file="+next);
+    $prev.attr("href", "#!file=" + prev);
+    $next.attr("href", "#!file=" + next);
+
+    this.loadQuickView(prev, $overlay);
+    this.loadQuickView(next, $overlay);
 
     img.onload = function () {
+      // TODO
+      // - 1 sec kesleltetes betolteskor (miutan a quickview bent van)
+      // - quickview-k betoltese nem azonnal mind (aktualis, next, prev)
+      // TODO check after the last /
+      // if (keptar.file && keptar.file === img.src) {
+      // }
+      this.loading = false;
       keptar.imageLoaded(img, $overlay);
       $spinner.hide();
     };
     img.src = image;
+    this.loading = true;
 
   };
 
@@ -151,7 +165,7 @@
   Keptar.prototype.loadDir = function (dir) {
     var dataURL;
 
-    this.dir = dir + (dir[dir.length-1] === '/' ? '' : '/');
+    this.dir = dir + (dir[dir.length - 1] === '/' ? '' : '/');
     dataURL = this.dir + "images.json";
     $.getJSON(dataURL, $.proxy(this.loadDirCallback, this));
   };
@@ -177,12 +191,48 @@
       this.config.$container.append(thumbEl);
     }
 
-    setTimeout($.proxy(this.loadQuickView, this), 10);
-
   };
 
-  Keptar.prototype.loadQuickView = function () {
-    var imgObj, i, l;
+  Keptar.prototype.loadQuickView = function (image, $overlay) {
+    var imageObj, i, l, keptar, qvLoadedCb;
+
+    if (!this.images) {
+      return;
+    }
+
+    this.dir = this.dir || this.getDir(image);
+    keptar = this;
+
+    qvLoadedCb = function (e) {
+      var i, l, qvsrc, loadedsrc;
+
+      if (keptar.loading && keptar.file) {
+
+        for (i = 0, l = keptar.images.length; i < l; i++) {
+          if (keptar.images[i].quickview && keptar.dir + keptar.images[i].image === keptar.file) {
+            qvsrc = keptar.images[i].quickview.split('/').pop();
+            loadedsrc = this.src.split('/').pop();
+            if (qvsrc === loadedsrc) {
+              keptar.imageLoaded(this, $overlay);
+            }
+          }
+        }
+
+      }
+    };
+
+    for (i = 0, l = this.images.length; i < l; i++) {
+      if (this.images[i].quickview && this.dir + this.images[i].image === image) {
+        imageObj = new Image();
+        imageObj.src = this.dir + this.images[i].quickview;
+        this.images[i].qvimage = imageObj;
+        imageObj.onload = qvLoadedCb;
+      }
+    }
+  };
+
+  Keptar.prototype.loadQuickViews = function () {
+    var imageObj, i, l;
 
     if (!this.images) {
       return;
@@ -262,7 +312,7 @@
     path = image.split('/');
     path.pop();
     dir = path.join('/');
-    dir = dir + (dir[dir.length-1] === '/' ? '' : '/');
+    dir = dir + (dir[dir.length - 1] === '/' ? '' : '/');
 
     return dir;
   };
