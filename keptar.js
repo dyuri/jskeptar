@@ -119,24 +119,31 @@
     this.loadQuickView(prev, $overlay);
     this.loadQuickView(next, $overlay);
 
-    if (!this.img || !this.img.complete || !this.img.naturalWidth) {
-      this.img = new Image();
-
-      this.img.onload = function () {
-        // TODO
-        // - 1 sec kesleltetes betolteskor (miutan a quickview bent van)
-        // - quickview-k betoltese nem azonnal mind (aktualis, next, prev)
-        // TODO check after the last /
-        // if (keptar.file && keptar.file === img.src) {
-        // }
-        this.loading = false;
-        keptar.imageLoaded(this.img, $overlay);
-        $spinner.hide();
-      }.bind(this);
+    if (this.loadMain) {
+      clearTimeout(this.loadMain);
+      this.loadMain = null;
     }
 
-    this.img.src = image;
-    this.loading = true;
+    this.loadMain = setTimeout(function () {
+      if (this.loadMain) {
+        this.loadMain = null;
+      }
+      if (!this.img || (this.img.complete && this.img.naturalWidth)) {
+        this.img = new Image();
+
+        this.img.onload = function () {
+          // TODO check after the last /
+          // if (keptar.file && keptar.file === img.src) {
+          // }
+          this.loading = false;
+          keptar.imageLoaded(this.img, $overlay);
+          $spinner.hide();
+        }.bind(this);
+      }
+
+      this.img.src = image;
+      this.loading = true;
+    }.bind(this), 500);
 
   };
 
