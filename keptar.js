@@ -90,8 +90,7 @@
   };
 
   Keptar.prototype.loadImage = function (image, $overlay) {
-    var img = new Image(),
-        keptar = this,
+    var keptar = this,
         $prev = $overlay.find("a.prev"),
         $next = $overlay.find("a.next"),
         next = this.getNextImage(image),
@@ -120,18 +119,23 @@
     this.loadQuickView(prev, $overlay);
     this.loadQuickView(next, $overlay);
 
-    img.onload = function () {
-      // TODO
-      // - 1 sec kesleltetes betolteskor (miutan a quickview bent van)
-      // - quickview-k betoltese nem azonnal mind (aktualis, next, prev)
-      // TODO check after the last /
-      // if (keptar.file && keptar.file === img.src) {
-      // }
-      this.loading = false;
-      keptar.imageLoaded(img, $overlay);
-      $spinner.hide();
-    };
-    img.src = image;
+    if (!this.img || !this.img.complete || !this.img.naturalWidth) {
+      this.img = new Image();
+
+      this.img.onload = function () {
+        // TODO
+        // - 1 sec kesleltetes betolteskor (miutan a quickview bent van)
+        // - quickview-k betoltese nem azonnal mind (aktualis, next, prev)
+        // TODO check after the last /
+        // if (keptar.file && keptar.file === img.src) {
+        // }
+        this.loading = false;
+        keptar.imageLoaded(this.img, $overlay);
+        $spinner.hide();
+      }.bind(this);
+    }
+
+    this.img.src = image;
     this.loading = true;
 
   };
