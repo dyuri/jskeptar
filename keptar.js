@@ -79,7 +79,7 @@
         image: this.image,
         dir: this.dir
       });
-      $("body").append($overlay);
+      $("body").addClass('imageShown').append($overlay);
     }
 
     this.loadImage(image, $overlay);
@@ -87,6 +87,7 @@
 
   Keptar.prototype.hideImage = function () {
     $("#imgoverlay").remove();
+    $('body').removeClass('imageShown');
   };
 
   Keptar.prototype.loadImage = function (image, $overlay) {

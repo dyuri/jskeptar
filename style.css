@@ -5,6 +5,11 @@ body {
   font-family: Verdana, Arial, sans-serif;
 }
 
+.imageShown #content {
+  -webkit-filter: blur(2px) saturate(.5);
+  filter: blur(2px) saturate(.5);
+}
+
 .thumb {
   display: inline-block;
   position: relative;
