@@ -143,8 +143,8 @@
       }
 
       this.img.src = image;
-      this.loading = true;
     }.bind(this), 500);
+    this.loading = true;
 
   };
 
