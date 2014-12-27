@@ -1,7 +1,6 @@
 body {
-  background-color: #ccc;
-  color: #444;
-  text-shadow: 0 1px 1px white;
+  background-color: #363F45;
+  color: #fff;
   font-family: Verdana, Arial, sans-serif;
 }
 
@@ -16,33 +15,30 @@ body {
   overflow: hidden;
   margin: 5px;
   padding: 5px;
-  border: 1px solid #888;
-  background-color: #aaa;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  background-color: #3f61b5;
   text-align: center;
   height: 200px;
   width: 200px;
+  vertical-align: top;
 }
 
 .thumb span.title {
-  display: none;
+  display: block;
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   font-size: 10px;
   text-align: center;
-  padding: 3px 0 8px;
-  background-color: #888;
-  opacity: 0.6;
-  text-shadow: 0 1px 1px #ccc;
-  color: black;
+  padding: 3px 0 5px;
+  background-color: #303f9f;
+  color: #fff;
+  opacity: 0;
+  transition: opacity .2s;
 }
 
 .thumb:hover span.title {
-  display: block;
+  opacity: 1;
 }
 
 .thumb a {
