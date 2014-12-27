@@ -51,6 +51,9 @@
       if (this.file.toLowerCase().match(/\.(jpg|png|gif)/)) {
         // image
         this.showImage(this.file);
+      } else if (this.file.toLowerCase().match(/\.(mp4|webm|avi)/)) {
+        // video
+        this.showVideo(this.file);
       } else {
         // directory (?)
         this.hideImage();
@@ -63,12 +66,17 @@
 
   };
 
-  Keptar.prototype.showImage = function (image) {
+  Keptar.prototype.showVideo = function (video) {
+    this.showImage(video, 'video');
+  };
+
+  Keptar.prototype.showImage = function (image, type) {
     this.image = image;
+    this.file = this.file || this.image;
     var $overlay = $("#imgoverlay"), path;
 
     if (!this.dir) {
-      this.dir = this.getDir(this.image);
+      this.dir = this.getDir(this.file);
       this.loadDir(this.dir);
     }
 
@@ -82,7 +90,17 @@
       $("body").addClass('imageShown').append($overlay);
     }
 
-    this.loadImage(image, $overlay);
+    this.loadFile(image, $overlay, type);
+  };
+
+  Keptar.prototype.loadFile = function (file, $overlay, type) {
+    type = type || 'image';
+
+    if (type === 'video') {
+      this.loadVideo(file, $overlay);
+    } else {
+      this.loadImage(file, $overlay);
+    }
   };
 
   Keptar.prototype.hideImage = function () {
@@ -148,6 +166,53 @@
 
   };
 
+  Keptar.prototype.loadVideo = function (video, $overlay) {
+    var keptar = this,
+        videoEl = $('<video controls autoplay height=300>'),
+        $imgcnt = $overlay.find('.image'),
+        $prev = $overlay.find("a.prev"),
+        $next = $overlay.find("a.next"),
+        next = this.getNextImage(video),
+        prev = this.getPrevImage(video),
+        notsupported = 'Your browser cannot play this video, you can <a href="'+video+'">download</a> it anyway.',
+        i, l;
+
+    if (this.dir && this.images) {
+      for (i = 0, l = this.images.length; i < l; i++) {
+        if (this.dir + this.images[i].file === video) {
+          if (this.images[i].qvimage &&
+              this.images[i].qvimage.complete) {
+            this.imageLoaded(this.images[i].qvimage, $overlay);
+          } else {
+            this.loadQuickView(video, $overlay);
+          }
+        }
+      }
+    }
+
+    $prev.attr("href", "#!file=" + prev);
+    $next.attr("href", "#!file=" + next);
+
+    this.loadQuickView(prev, $overlay);
+    this.loadQuickView(next, $overlay);
+
+    this.loading = false;
+    
+    videoEl.append('<source src="'+video+'">');
+    videoEl.append(notsupported);
+
+    videoEl.find('source').last().on('error', function (e) {
+      $imgcnt.html(videoEl.html());
+    });
+
+    $imgcnt.html(videoEl);
+
+    // TODO
+    // - video above close overlay
+    // - error message style, position
+    // - video player size
+  };
+
   Keptar.prototype.imageLoaded = function (image, $overlay) {
     var $imgcnt = $overlay.find('.image'),
         mw, mh, w, h, next, prev;
@@ -183,7 +248,7 @@
   };
 
   Keptar.prototype.loadDirCallback = function (data) {
-    var i, l, thumbEl,
+    var i, l, tmpl, thumbEl, img, type,
         fragment = document.createDocumentFragment();
 
     this.images = [];
@@ -195,24 +260,27 @@
     }
 
     for (i = 0, l = this.images.length; i < l; i++) {
-      thumbEl = $.tmpl(this.config.thumbtmpl, {
-        url: "#!file=" + this.dir + this.images[i].image,
-        title: this.images[i].title || this.images[i].image,
-        thumb: this.dir + this.images[i].thumbnail
+      img = this.images[i];
+      type = img.type || 'image';
+      tmpl = this.config.thumbtmpl[type] || this.config.thumbtmpl.image;
+      thumbEl = $.tmpl(tmpl, {
+        url: "#!file=" + this.dir + (img.file || img.image),
+        title: img.title || img.name || img.file || img.image,
+        thumb: this.dir + img.thumbnail
       });
       this.config.$container.append(thumbEl);
     }
 
   };
 
-  Keptar.prototype.loadQuickView = function (image, $overlay) {
+  Keptar.prototype.loadQuickView = function (file, $overlay) {
     var imageObj, i, l, keptar, qvLoadedCb;
 
     if (!this.images) {
       return;
     }
 
-    this.dir = this.dir || this.getDir(image);
+    this.dir = this.dir || this.getDir(file);
     keptar = this;
 
     qvLoadedCb = function (e) {
@@ -221,7 +289,7 @@
       if (keptar.loading && keptar.file) {
 
         for (i = 0, l = keptar.images.length; i < l; i++) {
-          if (keptar.images[i].quickview && keptar.dir + keptar.images[i].image === keptar.file) {
+          if (keptar.images[i].quickview && keptar.dir + (keptar.images[i].file || keptar.images[i].image) === keptar.file) {
             qvsrc = keptar.images[i].quickview.split('/').pop();
             loadedsrc = this.src.split('/').pop();
             if (qvsrc === loadedsrc) {
@@ -234,7 +302,7 @@
     };
 
     for (i = 0, l = this.images.length; i < l; i++) {
-      if (this.images[i].quickview && this.dir + this.images[i].image === image) {
+      if (this.images[i].quickview && this.dir + (this.images[i].file || this.images[i].image) === file) {
         imageObj = new Image();
         imageObj.src = this.dir + this.images[i].quickview;
         this.images[i].qvimage = imageObj;
@@ -270,15 +338,15 @@
     }
 
     l = this.images.length;
-    img = this.dir + this.images[0].image;
+    img = this.dir + (this.images[0].file || this.images[0].image);
 
     if (img === image) {
-      return this.dir + this.images[l - 1].image;
+      return this.dir + (this.images[l - 1].file || this.images[l - 1].image);
     }
 
     prev = img;
     for (i = 1; i < l; i++) {
-      img = this.dir + this.images[i].image;
+      img = this.dir + (this.images[i].file || this.images[i].image);
       if (img === image) {
         return prev;
       }
@@ -298,15 +366,15 @@
     }
 
     l = this.images.length;
-    img = this.dir + this.images[l - 1].image;
+    img = this.dir + (this.images[l - 1].file || this.images[l - 1].image);
 
     if (img === image) {
-      return this.dir + this.images[0].image;
+      return this.dir + (this.images[0].file || this.images[0].image);
     }
 
     next = img;
     for (i = l - 2; i >= 0; i--) {
-      img = this.dir + this.images[i].image;
+      img = this.dir + (this.images[i].file || this.images[i].image);
       if (img === image) {
         return next;
       }
@@ -330,7 +398,10 @@
   };
 
   Keptar.CONFIG = {
-    thumbtmpl: $.template(null, '<div class="thumb"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>'),
+    thumbtmpl: {
+      image: $.template(null, '<div class="thumb"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>'),
+      video: $.template(null, '<div class="thumb video"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>')
+    },
     overlaytmpl: $.template(null, '<div id="imgoverlay" class="overlay"><div class="bg"></div><div class="spinner">loading...</div><div class="nav"><a class="prev" href="#!file=${prev}"><span>&lt;</span></a><a class="next" href="#!file=${next}"><span>&gt;</span></a><a class="close" href="#!file=${dir}"><span>[x]</span></a><a class="download" href="${image}"><span>Download</span></a></div><div class="image"></div></div>'),
     $container: $("#content")
   };
