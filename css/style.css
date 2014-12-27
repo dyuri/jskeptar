@@ -37,6 +37,14 @@ body {
   transition: opacity .2s;
 }
 
+.thumb.video {
+  background-color: #4caf50;
+}
+
+.thumb.video span.title {
+  background-color: #388e3c;
+}
+
 .thumb:hover span.title {
   opacity: 1;
 }
