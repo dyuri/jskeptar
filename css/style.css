@@ -112,11 +112,30 @@ body {
   text-align: center;
 }
 
+#imgoverlay .image span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 1em;
+  font-weight: bold;
+  z-index: 105;
+  text-shadow: 0 0 3px black;
+}
+
 #imgoverlay .image img {
   display: inline-block;
   border: 1px solid black;
   max-height: 100%;
   max-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
 }
 
 #imgoverlay .nav {
@@ -217,4 +236,15 @@ body {
   right: 0;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
+}
+
+#imgoverlay .image video {
+  width: 80%;
+  height: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
 }

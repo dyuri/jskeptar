@@ -112,11 +112,13 @@
     var keptar = this,
         $prev = $overlay.find("a.prev"),
         $next = $overlay.find("a.next"),
+        $download = $overlay.find("a.download"),
         next = this.getNextImage(image),
         prev = this.getPrevImage(image),
         $spinner = $overlay.find(".spinner"),
         i, l;
 
+    $overlay.attr('data-type', 'image');
     $spinner.show();
 
     if (this.dir && this.images) {
@@ -134,6 +136,7 @@
 
     $prev.attr("href", "#!file=" + prev);
     $next.attr("href", "#!file=" + next);
+    $download.attr("href", image);
 
     this.loadQuickView(prev, $overlay);
     this.loadQuickView(next, $overlay);
@@ -168,38 +171,25 @@
 
   Keptar.prototype.loadVideo = function (video, $overlay) {
     var keptar = this,
-        videoEl = $('<video controls autoplay height=300>'),
+        videoEl = $('<video autoplay>'),
         $imgcnt = $overlay.find('.image'),
         $prev = $overlay.find("a.prev"),
         $next = $overlay.find("a.next"),
+        $download = $overlay.find("a.download"),
         next = this.getNextImage(video),
         prev = this.getPrevImage(video),
-        notsupported = 'Your browser cannot play this video, you can <a href="'+video+'">download</a> it anyway.',
+        notsupported = $('<span>Your browser cannot play this video, you can download it by the link at the bottom.</span><div class="image"></div>'),
         i, l;
 
-    if (this.dir && this.images) {
-      for (i = 0, l = this.images.length; i < l; i++) {
-        if (this.dir + this.images[i].file === video) {
-          if (this.images[i].qvimage &&
-              this.images[i].qvimage.complete) {
-            this.imageLoaded(this.images[i].qvimage, $overlay);
-          } else {
-            this.loadQuickView(video, $overlay);
-          }
-        }
-      }
-    }
+    $overlay.attr('data-type', 'video');
 
-    $prev.attr("href", "#!file=" + prev);
-    $next.attr("href", "#!file=" + next);
-
-    this.loadQuickView(prev, $overlay);
-    this.loadQuickView(next, $overlay);
-
-    this.loading = false;
-    
-    videoEl.append('<source src="'+video+'">');
+    videoEl.append('<source src="'+video+'" />');
     videoEl.append(notsupported);
+
+    videoEl.css({
+      'max-width': $overlay.width() * .9,
+      'max-height': $overlay.height() * .9
+    });
 
     videoEl.find('source').last().on('error', function (e) {
       $imgcnt.html(videoEl.html());
@@ -207,10 +197,30 @@
 
     $imgcnt.html(videoEl);
 
+    $prev.attr("href", "#!file=" + prev);
+    $next.attr("href", "#!file=" + next);
+    $download.attr("href", video);
+
+    this.loadQuickView(prev, $overlay);
+    this.loadQuickView(next, $overlay);
+
+    this.loading = false;
+
+    if (this.dir && this.images) {
+      for (i = 0, l = this.images.length; i < l; i++) {
+        if (this.dir + this.images[i].file === video) {
+          if (this.images[i].qvimage &&
+              this.images[i].qvimage.complete) {
+            this.imageLoaded(this.images[i].qvimage, videoEl);
+          } else {
+            this.loadQuickView(video, videoEl);
+          }
+        }
+      }
+    }
+
     // TODO
     // - video above close overlay
-    // - error message style, position
-    // - video player size
   };
 
   Keptar.prototype.imageLoaded = function (image, $overlay) {
