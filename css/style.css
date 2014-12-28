@@ -158,19 +158,6 @@ body {
   display: block;
 }
 
-#imgoverlay .nav a.close {
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 109;
-  cursor: default;
-}
-
-#imgoverlay .nav a.close span {
-  display: none;
-}
-
 #imgoverlay .nav a.prev,
 #imgoverlay .nav a.next {
   width: 100px;
@@ -181,6 +168,24 @@ body {
   z-index: 110;
   opacity: .1;
   color: #888;
+}
+
+#imgoverlay .nav a.close {
+  display: none;
+  width: 100px;
+  height: 100px;
+  font-size: 50px;
+  font-weight: bold;
+  line-height: 100px;
+  z-index: 120;
+  opacity: .2;
+  color: #888;
+  left: auto;
+  right: 0;
+}
+
+#imgoverlay[data-type="video"] .nav a.close {
+  display: block;
 }
 
 #imgoverlay .nav a.download {
@@ -194,6 +199,7 @@ body {
   bottom: 0;
 }
 
+#imgoverlay .nav a.close:hover,
 #imgoverlay .nav a.download:hover,
 #imgoverlay .nav a.prev:hover,
 #imgoverlay .nav a.next:hover {
