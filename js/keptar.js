@@ -36,6 +36,14 @@
     if ("onhashchange" in window) {
       $(window).bind("hashchange", $.proxy(this.update, this));
     }
+
+    $(document).on('click', '.nav .image', function (e) {
+      window.location.hash = '#!file='+this.dir;
+    }.bind(this));
+
+    $(document).on('click', '.nav .image video', function (e) {
+      e.stopPropagation();
+    });
   };
 
   Keptar.prototype.init = function () {
@@ -171,7 +179,7 @@
 
   Keptar.prototype.loadVideo = function (video, $overlay) {
     var keptar = this,
-        videoEl = $('<video autoplay>'),
+        videoEl = $('<video autoplay controls>'),
         $imgcnt = $overlay.find('.image'),
         $prev = $overlay.find("a.prev"),
         $next = $overlay.find("a.next"),
@@ -219,8 +227,6 @@
       }
     }
 
-    // TODO
-    // - video above close overlay
   };
 
   Keptar.prototype.imageLoaded = function (image, $overlay) {
@@ -412,7 +418,7 @@
       image: $.template(null, '<div class="thumb"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>'),
       video: $.template(null, '<div class="thumb video"><a href="${url}"><img src="${thumb}" alt="${title}"/></a><span class="title">${title}</span></div>')
     },
-    overlaytmpl: $.template(null, '<div id="imgoverlay" class="overlay"><div class="bg"></div><div class="spinner">loading...</div><div class="nav"><a class="prev" href="#!file=${prev}"><span>&lt;</span></a><a class="next" href="#!file=${next}"><span>&gt;</span></a><a class="close" href="#!file=${dir}"><span>[x]</span></a><a class="download" href="${image}"><span>Download</span></a></div><div class="image"></div></div>'),
+    overlaytmpl: $.template(null, '<div id="imgoverlay" class="overlay"><div class="bg"></div><div class="spinner">loading...</div><div class="nav"><a class="prev" href="#!file=${prev}"><span>&lt;</span></a><a class="next" href="#!file=${next}"><span>&gt;</span></a><a class="close" href="#!file=${dir}"><span>[x]</span></a><a class="download" href="${image}"><span>Download</span></a><div class="image"></div></div></div>'),
     $container: $("#content")
   };
 
